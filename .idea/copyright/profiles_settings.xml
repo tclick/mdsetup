@@ -1,0 +1,17 @@
+<component name="CopyrightManager">
+  <settings default="GPL v3+">
+    <module2copyright>
+      <element module="Project Files" copyright="GPL v3+" />
+    </module2copyright>
+    <LanguageOptions name="Python">
+      <option name="fileTypeOverride" value="3" />
+      <option name="block" value="false" />
+      <option name="separateBefore" value="true" />
+      <option name="separateAfter" value="true" />
+      <option name="filler" value="-" />
+    </LanguageOptions>
+    <LanguageOptions name="Shell Script">
+      <option name="fileTypeOverride" value="3" />
+    </LanguageOptions>
+  </settings>
+</component>

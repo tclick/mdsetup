@@ -1,0 +1,13 @@
+{
+  "_template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python",
+  "author": "Timothy H. Click",
+  "copyright_year": "2023",
+  "development_status": "Development Status :: 3 - Alpha",
+  "email": "timothy.click@briarcliff.edu",
+  "friendly_name": "Molecular Dynamics Setup",
+  "github_user": "tclick",
+  "license": "GPL-3.0",
+  "package_name": "mdsetup",
+  "project_name": "mdsetup",
+  "version": "0.1.0"
+}

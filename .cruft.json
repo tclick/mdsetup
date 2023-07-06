@@ -1,0 +1,21 @@
+{
+  "template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python",
+  "commit": "9343fc88158a8cd3f2a121c24506fa410b350792",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "mdsetup",
+      "package_name": "mdsetup",
+      "friendly_name": "Molecular Dynamics Setup",
+      "author": "Timothy H. Click",
+      "email": "timothy.click@briarcliff.edu",
+      "github_user": "tclick",
+      "version": "0.1.0",
+      "copyright_year": "2023",
+      "license": "GPL-3.0",
+      "development_status": "Development Status :: 3 - Alpha",
+      "_template": "https://github.com/cjolowicz/cookiecutter-hypermodern-python"
+    }
+  },
+  "directory": null
+}
