@@ -35,8 +35,8 @@ import logging
 import sys
 
 from loguru import logger
-from mdsetup.cli import main
 
+from mdsetup.cli import main
 
 if not sys.warnoptions:
     import warnings

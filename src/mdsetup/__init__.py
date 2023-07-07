@@ -33,11 +33,9 @@
 """Molecular dynamics setup."""
 import getpass
 import sys
-from typing import ParamSpec
-from typing import TypeVar
+from typing import ParamSpec, TypeVar
 
 from loguru import logger
-
 
 T = TypeVar("T")
 P = ParamSpec("P")
