@@ -11,6 +11,7 @@
 
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)][pre-commit]
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)][black]
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](ruff)
 
 [pypi status]: https://pypi.org/project/mdsetup/
 [read the docs]: https://mdsetup.readthedocs.io/
@@ -18,6 +19,7 @@
 [codecov]: https://app.codecov.io/gh/tclick/mdsetup
 [pre-commit]: https://github.com/pre-commit/pre-commit
 [black]: https://github.com/psf/black
+[ruff]: https://github.com/astral-sh/ruff
 
 ## Introduction
 
