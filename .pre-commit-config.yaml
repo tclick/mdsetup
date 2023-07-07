@@ -38,18 +38,6 @@ repos:
       - id: mixed-line-ending
   - repo: local
     hooks:
-      - id: autoflake
-        name: autoflake
-        entry: poetry run autoflake -r -i --remove-all-unused-imports --remove-unused-variables
-        language: system
-        types: [python]
-      - id: bandit
-        name: bandit
-        entry: poetry run bandit
-        language: system
-        types: [python]
-        require_serial: true
-        args: ["-c", "pyproject.toml"]
       - id: black
         name: black
         entry: poetry run black
@@ -69,16 +57,6 @@ repos:
         types: [python]
         require_serial: true
         args: [--darglint-ignore-regex, .*]
-      - id: reorder-python-imports
-        name: Reorder python imports
-        description: This hook reorders imports in python files.
-        entry: poetry run reorder-python-imports
-        args: ["--py39-plus"]
-        language: python
-        types: [python]
-        # for backward compatibility
-        files: ""
-        minimum_pre_commit_version: 0.15.0
       - id: pyupgrade
         name: pyupgrade
         description: Automatically upgrade syntax for newer versions.
@@ -86,6 +64,11 @@ repos:
         language: system
         types: [python]
         args: [--py39-plus]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.0.277
+    hooks:
+      - id: ruff
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v2.6.0
     hooks:
