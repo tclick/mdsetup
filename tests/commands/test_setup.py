@@ -32,6 +32,7 @@
 # ------------------------------------------------------------------------------
 """Test for mdsetup.commands.cmd_setup subcommand."""
 import os
+from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
@@ -68,3 +69,27 @@ class TestInit:
 
         assert "Usage:" in result.output
         assert result.exit_code == os.EX_OK
+
+    def test_setup(self, cli_runner: CliRunner) -> None:
+        """Test subcommand in an isolated filesystem.
+
+        GIVEN an output subdirectory
+        WHEN invoking the setup subcommand
+        THEN the subcommand will complete successfully.
+
+        Parameters
+        ----------
+        cli_runner : CliRunner
+            CLI runner
+        """
+
+        with cli_runner.isolated_filesystem() as ifs:
+            tmp_path = Path(ifs)
+            logfile = tmp_path / "setup.log"
+            outdir = tmp_path / "test"
+
+            result = cli_runner.invoke(cli, ["-o", outdir.as_posix(), "-l", logfile.as_posix()])
+
+            assert logfile.exists() and logfile.stat().st_size > 0
+            assert outdir.exists() and outdir.is_dir()
+            assert result.exit_code == os.EX_OK
