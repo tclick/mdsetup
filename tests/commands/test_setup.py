@@ -35,7 +35,7 @@ import os
 
 import pytest
 from click.testing import CliRunner
-from mdsetup.commands.cmd_init import cli
+from mdsetup.commands.cmd_setup import cli
 
 
 class TestInit:
