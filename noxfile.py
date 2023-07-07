@@ -206,7 +206,16 @@ def tests(sessions: Session) -> None:
     sessions.install(".")
     sessions.install("coverage[toml]", "pytest", "pygments", "pytest-random-order", "pytest-mock")
     try:
-        sessions.run("coverage", "run", "--parallel", "-m", "pytest", "--random-order", *sessions.posargs)
+        sessions.run(
+            "coverage",
+            "run",
+            "--parallel",
+            "-m",
+            "pytest",
+            "--random-order",
+            "--disable-pytest-warnings",
+            *sessions.posargs,
+        )
     finally:
         if sessions.interactive:
             sessions.notify("coverage", posargs=[])
@@ -230,7 +239,9 @@ def typeguard(sessions: Session) -> None:
     """Runtime type checking using Typeguard."""
     sessions.install(".")
     sessions.install("pytest", "typeguard", "pygments", "pytest-random-order", "pytest-mock")
-    sessions.run("pytest", f"--typeguard-packages={package}", "--random-order", *sessions.posargs)
+    sessions.run(
+        "pytest", f"--typeguard-packages={package}", "--random-order", "--disable-pytest-warnings", *sessions.posargs
+    )
 
 
 @session(python=python_versions)
