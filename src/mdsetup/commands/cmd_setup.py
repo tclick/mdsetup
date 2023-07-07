@@ -31,12 +31,15 @@
 #  DAMAGE.
 # ------------------------------------------------------------------------------
 """Initialization subcommand for mdsetup."""
+from itertools import product
 from pathlib import Path
 
 import click
 from click_extra import help_option, timer_option
+from loguru import logger
 
 from .. import __copyright__, config_logger
+from . import FILE_MODE
 
 
 @click.command(
@@ -48,7 +51,7 @@ from .. import __copyright__, config_logger
     "-o",
     "--outdir",
     metavar="DIR",
-    default=Path.cwd().joinpath("amber"),
+    default=Path.cwd() / "amber",
     show_default=True,
     type=click.Path(exists=False, file_okay=False, dir_okay=True, path_type=Path),
     help="Parent directory",
@@ -87,3 +90,28 @@ def cli(outdir: Path, logfile: Path, verbose: str) -> None:
     """
     config_logger(logfile=logfile.as_posix(), level=verbose)
     click.echo(__copyright__)
+
+    directories = ("Prep", "Equil", "Prod", "Analysis", "Scripts")
+    for _ in directories:
+        directory = outdir / _
+        logger.info(f"Creating {directory.as_posix()}")
+        directory.mkdir(mode=FILE_MODE, parents=True, exist_ok=True)
+
+    # Equilibration subdirectories
+    equilibration = ("min", "md")
+    subsection = (1, 2, 11, 12, 13, 14, 15, 16)
+    directories = (
+        outdir / "Equil" / f"{x}{y:d}" for x, y in product(equilibration, subsection) if f"{x}{y:d}" != "min16"
+    )
+    for directory in directories:
+        logger.info(f"Creating {directory.as_posix()}")
+        directory.mkdir(mode=FILE_MODE, parents=True, exist_ok=True)
+
+    # Production subdirectories
+    production = ("mdst", "mdprod")
+    for _ in production:
+        directory = outdir / "Prod" / _
+        logger.info(f"Creating {directory.as_posix()}")
+        directory.mkdir(mode=FILE_MODE, parents=True, exist_ok=True)
+
+    logger.success("Simulation subdirectories created.")
