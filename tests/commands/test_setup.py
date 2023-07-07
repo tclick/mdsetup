@@ -30,11 +30,66 @@
 #  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 #  DAMAGE.
 # ------------------------------------------------------------------------------
-"""Molecular dynamics setup subcommands."""
-import stat
+"""Test for mdsetup.commands.cmd_setup subcommand."""
+import os
+from pathlib import Path
 
-from loguru import logger
+import pytest
+from click.testing import CliRunner
+from mdsetup.commands.cmd_setup import cli
 
-logger.debug("Initializing commands module.")
 
-FILE_MODE = stat.S_ISUID | stat.S_ISVTX | stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
+class TestInit:
+    """Run test for setup subcommand."""
+
+    @pytest.fixture()
+    def cli_runner(self) -> CliRunner:
+        """Fixture for testing `click` commands.
+
+        Returns
+        -------
+        CliRunner
+            CLI runner
+        """
+        return CliRunner()
+
+    def test_help(self, cli_runner: CliRunner) -> None:
+        """Test help output.
+
+        GIVEN the init subcommand
+        WHEN the help option is invoked
+        THEN the help output should be displayed
+
+        Parameters
+        ----------
+        cli_runner : CliRunner
+            Command-line cli_runner
+        """
+        result = cli_runner.invoke(cli, ["-h"])
+
+        assert "Usage:" in result.output
+        assert result.exit_code == os.EX_OK
+
+    def test_setup(self, cli_runner: CliRunner) -> None:
+        """Test subcommand in an isolated filesystem.
+
+        GIVEN an output subdirectory
+        WHEN invoking the setup subcommand
+        THEN the subcommand will complete successfully.
+
+        Parameters
+        ----------
+        cli_runner : CliRunner
+            CLI runner
+        """
+
+        with cli_runner.isolated_filesystem() as ifs:
+            tmp_path = Path(ifs)
+            logfile = tmp_path / "setup.log"
+            outdir = tmp_path / "test"
+
+            result = cli_runner.invoke(cli, ["-o", outdir.as_posix(), "-l", logfile.as_posix()])
+
+            assert logfile.exists() and logfile.stat().st_size > 0
+            assert outdir.exists() and outdir.is_dir()
+            assert result.exit_code == os.EX_OK

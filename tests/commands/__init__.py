@@ -30,11 +30,4 @@
 #  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 #  DAMAGE.
 # ------------------------------------------------------------------------------
-"""Molecular dynamics setup subcommands."""
-import stat
-
-from loguru import logger
-
-logger.debug("Initializing commands module.")
-
-FILE_MODE = stat.S_ISUID | stat.S_ISVTX | stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH
+"""mdsetup subcommands."""
