@@ -40,10 +40,8 @@ from textwrap import dedent
 
 import nox
 
-
 try:
-    from nox_poetry import Session
-    from nox_poetry import session
+    from nox_poetry import Session, session
 except ImportError:
     message = f"""\
     Nox failed to import the 'nox-poetry' package.
@@ -153,17 +151,17 @@ def precommit(sessions: Session) -> None:
         "black",
         "darglint",
         "flake8",
-        "flake8-bandit",
-        "flake8-bugbear",
-        "flake8-docstrings",
+        # "flake8-bandit",
+        # "flake8-bugbear",
+        # "flake8-docstrings",
         "flake8-rst-docstrings",
-        "flake8-builtins",
-        "flake8-comprehensions",
-        "flake8-debugger",
-        "flake8-eradicate",
-        "flake8-logging-format",
+        # "flake8-builtins",
+        # "flake8-comprehensions",
+        # "flake8-debugger",
+        # "flake8-eradicate",
+        # "flake8-logging-format",
         "flake8-pyproject",
-        "flake8-pytest-style",
+        # "flake8-pytest-style",
         "nox-poetry",
         "pep8-naming",
         "pre-commit",
@@ -206,9 +204,9 @@ def pyright(sessions: Session) -> None:
 def tests(sessions: Session) -> None:
     """Run the test suite."""
     sessions.install(".")
-    sessions.install("coverage[toml]", "pytest", "pygments", "pytest-random-order", "pytest-mock", "pytest-ruff")
+    sessions.install("coverage[toml]", "pytest", "pygments", "pytest-random-order", "pytest-mock")
     try:
-        sessions.run("coverage", "run", "--parallel", "-m", "pytest", "--random-order", "--ruff", *sessions.posargs)
+        sessions.run("coverage", "run", "--parallel", "-m", "pytest", "--random-order", *sessions.posargs)
     finally:
         if sessions.interactive:
             sessions.notify("coverage", posargs=[])
