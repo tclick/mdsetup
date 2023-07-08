@@ -37,6 +37,11 @@ __all__ = ["PDB", "TOP", "TOPWW"]
 
 _data_ref = resources.files("tests.data")
 
-PDB = resources.as_file(_data_ref / "rnase2_amber.pdb")
-TOP = resources.as_file(_data_ref / "rnase2.parm7")
-TOPWW = resources.as_file(_data_ref / "rnase2_nowat.parm7")
+with resources.as_file(_data_ref / "rnase2_amber.pdb") as f:
+    PDB = f.as_posix()
+
+with resources.as_file(_data_ref / "rnase2.parm7") as f:
+    TOP = f.as_posix()
+
+with resources.as_file(_data_ref / "rnase2_nowat.parm7") as f:
+    TOPWW = f.as_posix()
