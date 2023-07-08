@@ -77,5 +77,5 @@ def write_template(data: dict[str, Any], subdir: Path, package_path: Path, templ
                 logger.info(f"Writing script to {input_file}")
                 print(template_output.render(data=data), file=infile)
     except TemplateNotFound:
-        logger.exception(f"Could not load {template}.jinja2", exc_info=True)
+        logger.opt(exception=True).exception(f"Could not load {template}.jinja2", exc_info=True)
         raise
