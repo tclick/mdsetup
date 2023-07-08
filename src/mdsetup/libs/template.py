@@ -37,17 +37,19 @@ from typing import Any
 from jinja2 import Environment, PackageLoader, Template, TemplateNotFound
 from loguru import logger
 
+from ..commands import FILE_MODE
 
-def write_template(data: dict[str, Any], filename: Path, package_path: str, template: str) -> None:
+
+def write_template(data: dict[str, Any], subdir: Path, package_path: Path, template: str) -> None:
     """Write an Amber file from a template.
 
     Parameters
     ----------
     data : Dict[str, Any]
         information for the template file
-    filename : Path
-        Output filename
-    package_path : str
+    subdir : Path
+        Output directory
+    package_path : Path
         Location of template file
     template : str
         Template filename stem
@@ -58,12 +60,22 @@ def write_template(data: dict[str, Any], filename: Path, package_path: str, temp
         if template is not found
     """
     try:
-        with filename.open(mode="w") as infile:
-            loader = PackageLoader("mdsetup", package_path=package_path)
-            env = Environment(loader=loader, autoescape=True)
-            template_output: Template = env.get_template(f"{template}.jinja")
-            logger.info(f"Writing tLeap input script to {infile.name}")
-            print(template_output.render(data=data), file=infile)
+        loader = PackageLoader("mdsetup", package_path=package_path.as_posix())
+        env = Environment(loader=loader, autoescape=True)
+        for _ in loader.list_templates():
+            filename = Path(_)
+            subdirectory = subdir / filename.stem if "Scripts" not in (subdir / filename.stem).as_posix() else subdir
+            subdirectory.mkdir(mode=FILE_MODE, parents=True, exist_ok=True)
+            input_file = (
+                subdirectory / filename.with_suffix(".sh")
+                if "scripts" in package_path.as_posix()
+                else subdirectory / filename.with_suffix(".in")
+            )
+
+            with input_file.open(mode="w", encoding="utf-8") as infile:
+                template_output: Template = env.get_template(filename.as_posix())
+                logger.info(f"Writing script to {input_file}")
+                print(template_output.render(data=data), file=infile)
     except TemplateNotFound:
         logger.exception(f"Could not load {template}.jinja2", exc_info=True)
         raise
