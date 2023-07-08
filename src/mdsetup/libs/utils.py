@@ -30,18 +30,46 @@
 #  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 #  DAMAGE.
 # ------------------------------------------------------------------------------
-"""Various data files for testing."""
-from importlib import resources
+"""Run Amber command `tleap`."""
+import shutil
+import subprocess
+from pathlib import Path
 
-__all__ = ["PDB", "TOP", "TOPWW"]
+from loguru import logger
 
-_data_ref = resources.files("tests.data")
 
-with resources.as_file(_data_ref / "rnase2_amber.pdb") as f:
-    PDB = f.as_posix()
+def run_command(command: str, infile: Path, cmdlog: Path) -> None:
+    """Run shell command.
 
-with resources.as_file(_data_ref / "rnase2.parm7") as f:
-    TOP = f.as_posix()
+    Parameters
+    ----------
+    command : str
+        shell command
+    infile : Path
+        input file
+    cmdlog : Path
+        output from subprocess
 
-with resources.as_file(_data_ref / "rnase2_nowat.parm7") as f:
-    TOPWW = f.as_posix()
+    Raises
+    ------
+    FileNotFoundError
+        if command is not found
+    """
+    try:
+        logger.info("Generating AMBER topology and coordinate files.")
+        cmd = shutil.which(command)
+        if cmd is None:
+            logger.error(f"Could not find {command}.")
+            return None
+
+        with cmdlog.open("a") as log:
+            logger.info(f"Running {cmd}")
+            subprocess.run(
+                (cmd, "-f", infile.as_posix()),  # noqa: S603
+                stdout=log,
+                stderr=subprocess.STDOUT,
+                check=True,
+            )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        logger.exception(f"Could not run {command}", exc_info=True)
+        raise

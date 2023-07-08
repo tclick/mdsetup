@@ -30,18 +30,7 @@
 #  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 #  DAMAGE.
 # ------------------------------------------------------------------------------
-"""Various data files for testing."""
-from importlib import resources
+"""Utilities for the molecular dynamic setup."""
+from loguru import logger
 
-__all__ = ["PDB", "TOP", "TOPWW"]
-
-_data_ref = resources.files("tests.data")
-
-with resources.as_file(_data_ref / "rnase2_amber.pdb") as f:
-    PDB = f.as_posix()
-
-with resources.as_file(_data_ref / "rnase2.parm7") as f:
-    TOP = f.as_posix()
-
-with resources.as_file(_data_ref / "rnase2_nowat.parm7") as f:
-    TOPWW = f.as_posix()
+logger.debug("Initializing libs module.")
