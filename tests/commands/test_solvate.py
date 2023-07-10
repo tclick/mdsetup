@@ -32,10 +32,15 @@
 # ------------------------------------------------------------------------------
 """Test for mdsetup.commands.cmd_solvate subcommand."""
 import os
+import shutil
+import subprocess
+from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
 from mdsetup.commands import cmd_solvate
+
+from ..datafile import PDB, TOP
 
 
 class TestSolvate:
@@ -68,3 +73,93 @@ class TestSolvate:
 
         assert "Usage:" in result.output
         assert result.exit_code == os.EX_OK
+
+    def test_solvate(self, cli_runner: CliRunner, mocker):
+        """Test subcommand in an isolated filesystem.
+
+        GIVEN a topology and structure file
+        WHEN the solvate subcommand is called
+        THEN the system is neutralized and solvated.
+
+        Parameters
+        ----------
+        cli_runner : CliRunner
+            Command-line cli_runner
+        """
+        which = mocker.patch.object(shutil, "which", autospec=True)
+        run = mocker.patch.object(subprocess, "run", autospec=True)
+
+        with cli_runner.isolated_filesystem() as ifs:
+            tmp_path = Path(ifs)
+            prefix = Path("solvate")
+            logfile = tmp_path / prefix.with_suffix(".log")
+            infile = tmp_path / prefix.with_suffix(".in")
+
+            result = cli_runner.invoke(
+                cmd_solvate.cli,
+                [
+                    "-s",
+                    TOP,
+                    "-f",
+                    PDB,
+                    "-o",
+                    ifs,
+                    "-p",
+                    prefix.as_posix(),
+                    "-l",
+                    logfile.as_posix(),
+                    "--simprog",
+                    "amber",
+                    "--toppar",
+                    ifs,
+                ],
+                env={"AMBERHOME": ifs},
+            )
+
+            assert logfile.exists() and logfile.stat().st_size > 0
+            assert infile.exists() and infile.stat().st_size > 0
+            assert not (tmp_path / "tleap").exists()
+            assert result.exit_code == os.EX_OK
+
+        which.assert_called()
+        run.assert_called()
+
+    def test_no_amber(self, cli_runner: CliRunner, mocker):
+        """Test subcommand in an isolated filesystem.
+
+        GIVEN a topology and structure file
+        WHEN the solvate subcommand is called
+        THEN the system is neutralized and solvated.
+
+        Parameters
+        ----------
+        cli_runner : CliRunner
+            Command-line cli_runner
+        """
+        with cli_runner.isolated_filesystem() as ifs:
+            tmp_path = Path(ifs)
+            prefix = Path("solvate")
+            logfile = tmp_path / prefix.with_suffix(".log")
+            tmp_path / prefix.with_suffix(".in")
+
+            with pytest.raises(FileNotFoundError):
+                cli_runner.invoke(
+                    cmd_solvate.cli,
+                    [
+                        "-s",
+                        TOP,
+                        "-f",
+                        PDB,
+                        "-o",
+                        ifs,
+                        "-p",
+                        prefix.as_posix(),
+                        "-l",
+                        logfile.as_posix(),
+                        "--simprog",
+                        "amber",
+                        "--toppar",
+                        ifs,
+                    ],
+                    env={"AMBERHOME": ifs},
+                )

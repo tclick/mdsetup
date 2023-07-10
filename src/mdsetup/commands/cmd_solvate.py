@@ -34,18 +34,22 @@
 
 The `solvate` subcommand neutralizes and solvates a system. The system can be prepared for Amber, CHARMM , or Gromacs.
 """
+import shutil
 from pathlib import Path
 
 import click
 from click_extra import help_option, timer_option
+from loguru import logger
 
 from .. import __copyright__, config_logger
+from ..libs.template import write_template
+from ..libs.utils import run_command
 
 
 @click.command(
-    "create",
-    help="Prepare various Amber input files to run simulations",
-    short_help="Prepare input files for simulation.",
+    "solvate",
+    help="Neutraolize and solvate a system.",
+    short_help="Neutraolize and solvate a system.",
 )
 @click.option(
     "-s",
@@ -87,9 +91,9 @@ from .. import __copyright__, config_logger
     "-p",
     "--prefix",
     metavar="PREFIX",
-    default="solvated",
+    default="solvate",
     show_default=True,
-    type=click.STRING,
+    type=click.Path(path_type=Path),
     help="Prefix for output files",
 )
 @click.option(
@@ -97,7 +101,7 @@ from .. import __copyright__, config_logger
     "sim_prog",
     metavar="PROG",
     default="amber",
-    type=click.Choice("amber charmm gmx".split(), case_sensitive=False),
+    type=click.Choice("amber charmm gromacs".split(), case_sensitive=False),
     help="Simulation program",
 )
 @click.option(
@@ -124,7 +128,7 @@ def cli(
     infile: Path,
     outdir: Path,
     logfile: Path,
-    prefix: str,
+    prefix: Path,
     sim_prog: str,
     toppar: Path,
     ff: int,
@@ -142,7 +146,7 @@ def cli(
         Output directory
     logfile : Path
         Log file
-    prefix : str
+    prefix : Path
         Prefix for script files
     sim_prog : str, default='amber'
         Simulation program for output files
@@ -155,3 +159,24 @@ def cli(
     """
     config_logger(logfile=logfile.as_posix(), level=verbose)
     click.echo(__copyright__)
+
+    filename = outdir / prefix.with_suffix(".in")
+    logname = outdir / prefix.with_suffix(".log")
+    data = {"input": infile, "prefix": prefix.as_posix(), "toppar": toppar, "ff": ff}
+
+    templates = Path("templates")
+    template_subdir = Path(sim_prog) / "leap" if sim_prog == "amber" else Path(sim_prog) / "solvate"
+    package_path = templates / template_subdir
+
+    logger.info(f"Writing solvation script to {filename}")
+    write_template(data, subdir=outdir, package_path=package_path, template="solvate")
+
+    # Moves file to specified location and removes unnecessary subdirectory.
+    shutil.move(outdir / "solvate" / "solvate.in", filename)
+    extra_dirs = ("fixed", "solvate", "tleap")
+    for _ in extra_dirs:
+        shutil.rmtree(outdir / _, ignore_errors=True)
+
+    logger.info("Adding ions and solvating the system")
+    command = {"amber": "tleap"}
+    run_command(command[sim_prog], infile=filename, cmdlog=logname)
