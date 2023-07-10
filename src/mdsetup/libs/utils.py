@@ -59,8 +59,7 @@ def run_command(command: str, infile: Path, cmdlog: Path) -> None:
         logger.info("Generating AMBER topology and coordinate files.")
         cmd = shutil.which(command)
         if cmd is None:
-            logger.error(f"Could not find {command}.")
-            return None
+            raise FileNotFoundError  # noqa: TRY301
 
         with cmdlog.open("a") as log:
             logger.info(f"Running {cmd}")
@@ -70,6 +69,9 @@ def run_command(command: str, infile: Path, cmdlog: Path) -> None:
                 stderr=subprocess.STDOUT,
                 check=True,
             )
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        logger.exception(f"Could not run {command}", exc_info=True)
+    except FileNotFoundError:
+        logger.opt(exception=True).exception(f"Could not find {command}")
+        raise
+    except subprocess.CalledProcessError:
+        logger.opt(exception=True).exception(f"Could not run {command}")
         raise
